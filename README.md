@@ -8,7 +8,7 @@ Subdomain brute force focused on speed and data serialization.
 SimplyDomain uses a framework approach to build and deploy modules within. This allows
 for fast, easy and concise output to feed into larger OSINT feeds.
 
-# 3 Core Design Principals:
+## Three Core Design Principals:
 * Easy install - support as many *NIX* bassed platforms.
 * Pure Python - no other arbitrary set up processes and Python-3 support
 * Expose public API - allows for simplydomain to intergrate into other toolsets.
