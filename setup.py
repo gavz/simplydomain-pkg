@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
-setup(name='SimplyDomain',
+setup(name='simplydomain',
       version='1.0.11',
-      description='SimplyDomain is a very basic framework to automate domain brute forcing.',
-      url='http://github.com/SimplySecurity/SimplyDomain',
+      description='simplydomain is a very basic framework to automate domain brute forcing.',
+      url='http://github.com/SimplySecurity/simplydomain-pkg',
       author='Alexander Rymdeko-Harvey',
       author_email='a.rymdekoharvey@obscuritylabs.com',
       license='BSD 3.0',
