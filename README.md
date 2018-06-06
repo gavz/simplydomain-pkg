@@ -1,5 +1,4 @@
- [![Build Status](https://travis-ci.org/SimplySecurity/SimplyDomain.svg?branch=master)](https://travis-ci.org/SimplySecurity/SimplyDomain)
-  [![Coverage Status](https://coveralls.io/repos/github/SimplySecurity/SimplyDomain/badge.svg?branch=master)](https://coveralls.io/github/SimplySecurity/SimplyDomain?branch=master)
+[![Build Status](https://travis-ci.org/SimplySecurity/simplydomain-pkg.svg?branch=master)](https://travis-ci.org/SimplySecurity/simplydomain-pkg)
  ![Alt text](simplydomain/docs/SimplyDomain-logo.png?raw=true "SimplyDomain")
 
  
