@@ -9,6 +9,6 @@ install:
   - pip install coveralls
   - pip install .
 script:
-  - python3 simply_domain.py -h
+  - simply_domain.py -h
 
   
