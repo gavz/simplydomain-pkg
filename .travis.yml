@@ -1,5 +1,5 @@
 # sudo false implies containerized builds
-sudo: ture
+sudo: false
 language: python
 python:
   - 3.6
@@ -9,6 +9,6 @@ install:
   - pip install coveralls
   - pip install .
 script:
-  - python3 simplydomain.py -h
+  - python3 simply_domain.py -h
 
   
