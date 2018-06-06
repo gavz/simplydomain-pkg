@@ -84,7 +84,8 @@ class CoreProcess(core_printer.CorePrinters, core_progress.CoreProgress):
                     + str(item.subdomain), 'CoreProcess')
                 msg = self.green_text("Subdomain: %s Vaild: (%s)" %
                                       ('{0: <30}'.format('('+str(item.subdomain)+')'), str(item.valid)))
-                self.progress_print(msg)
+                if not self.config['silent']:
+                    self.progress_print(msg)
                 self.serialize_json_output.add_subdomain(item)
             if item == None:
                 self.logger.infomsg('_task_output_queue_consumer is (NONE) exiting thread', 'CoreProcess')
@@ -135,24 +136,25 @@ class CoreProcess(core_printer.CorePrinters, core_progress.CoreProgress):
         math to watch progress of Dynamic modules.
         :return: NONE
         """
-        start_count = len(self.procs)
-        self.start_progress_bar(self.module_count)
-        while self.check_active():
-            try:
-                dm = self.progress_bar_pickup.get()
-            except Exception as e:
-                print(e)
-            if dm == None:
-                self.close_progress_bar()
-                break
-            if dm:
-                if dm[0] == 'complete':
-                    self.progress_print(self.blue_text(dm[1]))
-                    self.inc_progress_bar(1)
-                if dm[0] == 'execute':
-                    self.progress_print(self.blue_text(dm[1]))
-            if self.progress_bar_pickup.empty():
-                time.sleep(0.1)
+        if not self.config['silent']:
+            start_count = len(self.procs)
+            self.start_progress_bar(self.module_count)
+            while self.check_active():
+                try:
+                    dm = self.progress_bar_pickup.get()
+                except Exception as e:
+                    print(e)
+                if dm == None:
+                    self.close_progress_bar()
+                    break
+                if dm:
+                    if dm[0] == 'complete':
+                        self.progress_print(self.blue_text(dm[1]))
+                        self.inc_progress_bar(1)
+                    if dm[0] == 'execute':
+                        self.progress_print(self.blue_text(dm[1]))
+                if self.progress_bar_pickup.empty():
+                    time.sleep(0.1)
 
 
     def _start_thread_function(self, pointer):
@@ -275,14 +277,16 @@ class CoreProcess(core_printer.CorePrinters, core_progress.CoreProgress):
                     + str(dm.info['Name']), 'CoreProcess')
                 msg = "Executing module: %s %s" %('{0: <22}'.format(
                     "("+dm.info['Module']+")"), "("+dm.info['Name']+")")
-                pbq.put(['execute', msg])
+                if not self.config['silent']:
+                    pbq.put(['execute', msg])
                 # blocking
                 dm.dynamic_main(queue_dict)
                 self.logger.infomsg('execute_processes() completed module: ' \
                     + str(dm.info['Name']), 'CoreProcess')
                 msg = "Module completed: %s %s" % (
                     '{0: <22}'.format("(" + dm.info['Module'] + ")"), "(" + dm.info['Name'] + ")")
-                pbq.put(['complete', msg])
+                if not self.config['silent']:
+                    pbq.put(['complete', msg])
             except Exception as e:
                 self.logger.warningmsg('execute_processes hit fatal error: ' \
                     + str(e), 'CoreProcess')
@@ -300,13 +304,16 @@ class CoreProcess(core_printer.CorePrinters, core_progress.CoreProgress):
         static_module = self.static_modules[mod_name]
         try:
             sm = static_module.DynamicModule(config)
-            self.print_green(" [*] Executing module: %s %s" %('{0: <22}'.format("("+sm.info['Module']+")"), "("+sm.info['Name']+")"))
+            if not self.config['silent']:
+                self.print_green(" [*] Executing module: %s %s" %('{0: <22}'.format("("+sm.info['Module']+")"), "("+sm.info['Name']+")"))
             sm.dynamic_main(queue_dict)
-            self.print_green(" [*] Module completed: %s %s" % (
-            '{0: <22}'.format("(" + sm.info['Module'] + ")"), "(" + sm.info['Name'] + ")"))
+            if not self.config['silent']:
+                self.print_green(" [*] Module completed: %s %s" % (
+                    '{0: <22}'.format("(" + sm.info['Module'] + ")"), "(" + sm.info['Name'] + ")"))
         except Exception as e:
-            self.print_red(" [!] Module process failed: %s %s" % (
-            '{0: <22}'.format("(" + sm.info['Module'] + ")"), "(" + str(e) + ")"))
+            if not self.config['silent']:
+                self.print_red(" [!] Module process failed: %s %s" % (
+                    '{0: <22}'.format("(" + sm.info['Module'] + ")"), "(" + str(e) + ")"))
 
     def check_active_len(self):
         """

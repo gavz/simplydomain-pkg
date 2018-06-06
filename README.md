@@ -28,5 +28,17 @@ python3 -m pip install simplydomain
 git clone git@github.com:SimplySecurity/simplydomain-pkg.git | cd simplydomain-pkg
 python3 -m pip install .
 ```
-## simplydomain CLI tools
-simplydomain has not been moved
+## simplydomain CLI tools (Quickstart)
+simplydomain supports a `bin` directory which are installed during the Python Setup PKG install. This now allows users to simply use their terminal of choice to use simplydomain.
+
+To display Help:
+```bash
+simply_domain.py -h 
+```
+To run a basic passive sub-domain search:
+```bash
+simply_domain.py -all uber.com
+```
+## simplydomain programming API 
+simplydomain now supports a full 
+

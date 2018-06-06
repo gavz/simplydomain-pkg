@@ -73,6 +73,7 @@ class CoreRuntime(module_loader.LoadModules,
         self.populate_task_queue(self.modules)
         self.logger.infomsg('execute_startup() start to create hollow processes for future work', 'CoreRuntime')
         self.start_processes()
+        self.config['silent'] = False
 
 
     def execute_dynamic(self):
@@ -119,6 +120,46 @@ class CoreRuntime(module_loader.LoadModules,
         if self.config['args'].raw_bruteforce:
             self.execute_process('simplydomain/src/static_modules/subdomain_raw_bruteforce.py', self.config, queue_dict)
         self.logger.infomsg('execute_static() static modules completed', 'CoreRuntime')
+
+    def execute_bruteforce(self, return_type='json'):
+        """
+        Executes only the domain Bruteforce module and retunr data.
+        """
+        try:
+            self.config['silent'] = True
+            self.populate_task_queue(self.modules)
+            self._start_threads()
+            self._start_thread_function(self._pbar_thread)
+            queue_dict = {
+                'task_queue': self.task_queue,
+                'task_output_queue': self.task_output_queue
+            }
+            if self.config['args'].wordlist_bruteforce:
+                self.execute_process('simplydomain/src/static_modules/subdomain_bruteforce.py', self.config, queue_dict)
+        finally:
+            self.join_threads()
+        # return JSON object
+        return self.execute_output_object(return_type)
+
+    def execute_raw_bruteforce(self, return_type='json'):
+        """
+        Executes only the domain Bruteforce module and retunr data.
+        """
+        try:
+            self.config['silent'] = True
+            self.populate_task_queue(self.modules)
+            self._start_threads()
+            self._start_thread_function(self._pbar_thread)
+            queue_dict = {
+                'task_queue': self.task_queue,
+                'task_output_queue': self.task_output_queue
+            }
+            if self.config['args'].raw_bruteforce:
+                self.execute_process('simplydomain/src/static_modules/subdomain_raw_bruteforce.py', self.config, queue_dict)
+        finally:
+            self.join_threads()
+        # return JSON object
+        return self.execute_output_object(return_type)
 
     def execute_amp(self, return_type='json'):
         """

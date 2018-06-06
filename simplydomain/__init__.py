@@ -106,6 +106,83 @@ def __parse_values(
         args.append(str(domain))
     return parser.parse_args(args)
 
+def execute_raw_bruteforce(
+        domain,
+        config={},
+        dnsservers=[],
+        debug='CRITICAL', 
+        verbose=False, 
+        wordlist_count=0,
+        return_type='json',
+        wordlist_bruteforce=False,
+        raw_bruteforce=True,
+        raw_depth=2
+    ):
+    """
+    executes the main search function of simplydomain:
+    config: sets the JSON config settings for the opperation
+    dnsservers: sets a list of top DNS servers to resolve.
+    debug: sets the log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    verbose: sets the verbose count
+    wordlist_count: cound to brute 1-1000000
+    return_type: (dict | json)
+    """
+    __set_logging(debug)
+    if not config:
+        config = __load_config()
+    if not dnsservers:
+        dnsservers = __load_dns(config)
+    config['args'] = __parse_values(
+        domain,
+        debug,
+        verbose,
+        wordlist_bruteforce,
+        wordlist_count,
+        raw_bruteforce,
+        raw_depth
+        )
+    cr = core_runtime.CoreRuntime(__core_logger, config)
+    return cr.execute_raw_bruteforce(return_type=return_type)
+
+def execute_wordlist_bruteforce(
+        domain,
+        config={},
+        dnsservers=[],
+        debug='CRITICAL', 
+        verbose=False, 
+        wordlist_count=100,
+        return_type='json',
+        wordlist_bruteforce=True,
+        raw_bruteforce=False,
+        raw_depth=0
+    ):
+    """
+    executes the main search function of simplydomain:
+    config: sets the JSON config settings for the opperation
+    dnsservers: sets a list of top DNS servers to resolve.
+    debug: sets the log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    verbose: sets the verbose count
+    wordlist_count: cound to brute 1-1000000
+    return_type: (dict | json)
+    """
+    __set_logging(debug)
+    if not config:
+        config = __load_config()
+    if not dnsservers:
+        dnsservers = __load_dns(config)
+    config['args'] = __parse_values(
+        domain,
+        debug,
+        verbose,
+        wordlist_bruteforce,
+        wordlist_count,
+        raw_bruteforce,
+        raw_depth
+        )
+    cr = core_runtime.CoreRuntime(__core_logger, config)
+    return cr.execute_bruteforce(return_type=return_type)
+
+
 
 def execute_search(
         domain,

@@ -78,6 +78,7 @@ class DynamicModule(module_helpers.RequestsHelpers):
         self.cs = core_scrub.Scrub()
         self.core_args = self.json_entry['args']
         self.core_resolvers = self.json_entry['resolvers']
+        self.silent = self.json_entry['silent']
 
     def dynamic_main(self, queue_dict):
         """
@@ -114,7 +115,7 @@ class DynamicModule(module_helpers.RequestsHelpers):
         # fancy iter so we can pull out only (N) lines
         sub_doamins = content.split()
         #sub_doamins = [next(content).strip() for x in range(self.word_count)]
-        for word in sub_doamins:
+        for word in sub_doamins[0:self.word_count]:
             # Wait on the semaphore before adding more tasks
             await self.sem.acquire()
             host = '{}.{}'.format(word.strip(), self.domain)
@@ -142,12 +143,12 @@ class DynamicModule(module_helpers.RequestsHelpers):
             self.logger("Brute forcing {} with a maximum of {} concurrent tasks...".format(self.domain, self.max_tasks))
             self.logger("Wordlist loaded, brute forcing {} DNS records".format(self.word_count))
             # TODO: enable verbose
-            self.pbar = tqdm(total=self.word_count, unit="records", maxinterval=0.1, mininterval=0)
+            if not self.silent:
+                self.pbar = tqdm(total=self.word_count, unit="records", maxinterval=0.1, mininterval=0)
             if recursive:
                 self.logger("Using recursive DNS with the following servers: {}".format(self.resolver.nameservers))
             else:
                 domain_ns = self.loop.run_until_complete(self._dns_lookup(self.domain, 'NS'))
-                print(domain_ns)
                 self.logger(
                     "Setting nameservers to {} domain NS servers: {}".format(self.domain, [host.host for host in domain_ns]))
                 self.resolver.nameservers = [socket.gethostbyname(host.host) for host in domain_ns]
@@ -160,21 +161,23 @@ class DynamicModule(module_helpers.RequestsHelpers):
         finally:
             self.loop.close()
             # TODO: enable verbose
-            self.pbar.close()
-            self.logger("completed, {} subdomains found.".format(len(self.fqdn)))
+            if not self.silent:
+                self.pbar.close()
+                self.logger("completed, {} subdomains found.".format(len(self.fqdn)))
         return self.fqdn
 
     def logger(self, msg, msg_type='info', level=0):
         """A quick and dirty msfconsole style stdout logger."""
         # TODO: enable verbose
-        style = {'info': ('[*]', 'blue'), 'pos': ('[+]', 'green'), 'err': ('[-]', 'red'),
-                 'warn': ('[!]', 'yellow'), 'dbg': ('[D]', 'cyan')}
-        if msg_type is not 0:
-            decorator = click.style('{}'.format(style[msg_type][0]), fg=style[msg_type][1], bold=True)
-        else:
-            decorator = ''
-        m = " {} {}".format(decorator, msg)
-        tqdm.write(m)
+        if not self.silent:
+            style = {'info': ('[*]', 'blue'), 'pos': ('[+]', 'green'), 'err': ('[-]', 'red'),
+                     'warn': ('[!]', 'yellow'), 'dbg': ('[D]', 'cyan')}
+            if msg_type is not 0:
+                decorator = click.style('{}'.format(style[msg_type][0]), fg=style[msg_type][1], bold=True)
+            else:
+                decorator = ''
+            m = " {} {}".format(decorator, msg)
+            tqdm.write(m)
 
     async def _dns_lookup(self, name, _type='A'):
         """Performs a DNS request using aiodns, returns an asyncio future."""
@@ -223,4 +226,5 @@ class DynamicModule(module_helpers.RequestsHelpers):
             # self.logger(future.result(), 'dbg', 3)
         self.tasks.remove(future)
         # TODO: enable verbose
-        self.pbar.update()
+        if not self.silent:
+            self.pbar.update()
