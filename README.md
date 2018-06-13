@@ -39,5 +39,5 @@ To run a basic passive sub-domain search:
 simply_domain.py -all uber.com
 ```
 ## simplydomain programming API 
-simplydomain now supports a full 
+TODO
 
